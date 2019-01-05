@@ -1,5 +1,7 @@
 <?php
 
+define('DEBUG_MODE', TRUE);
+
 function substr_map(&$line, $callback, $start, $length) {
 	$end_pos = strlen($line) - 1;
 
@@ -46,6 +48,23 @@ function matrix_replace(&$grid, $x, $y, $val) {
 
 function distance_between($x1, $y1, $x2, $y2) {
 	return abs($x1 - $x2) + abs($y1 - $y2);
+}
+
+function debug_msg($s) {
+	echo DEBUG_MODE ? $s . PHP_EOL : '';
+}
+
+function array_del_val($v, &$a) {
+	if (false !== ($pos = array_search($v, $a))) {
+		unset($a[$pos]);
+		return true;
+	}
+
+	return false;
+}
+
+function array_push2(&$a, $v) {
+	$a = array_merge(($a ?? []), [$v]);
 }
 
 class show_memory_timing {
