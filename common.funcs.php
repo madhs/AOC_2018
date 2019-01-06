@@ -96,6 +96,60 @@ class show_memory_timing {
 
 }
 
+function array_insert(&$a, $v, $pos) {
+	$tmp = array_splice($a, $pos);
+	// echo $pos . ' ';
+	// echo implode(',', $a) . ' ';
+	// echo implode(',', $tmp);die;
+	array_push2($a, $v);
+	$a = array_merge($a, $tmp);
+}
+
+function array_cycle_insert(&$a, $v, $curr_pos, $offset) {
+	$c = count($a);
+	$offset = ($offset < 0) ? ($offset + 1) : $offset;
+	$ins_idx = ($curr_pos - 1) + $offset; // Convert position to array idx
+	while ($ins_idx > $c || $ins_idx < 0) {
+		$ins_idx += ($ins_idx > $c) ? -$c : $c;
+	}
+	array_insert($a, $v, $ins_idx);
+	return $ins_idx + 1;
+}
+
+function array_delete(&$a, $pos) {
+	$tmp = array_splice($a, $pos);
+	// echo $pos . ' ';
+	// echo implode(',', $a) . ' ';
+	// echo implode(',', $tmp) . ' ';
+	$v = array_shift($tmp);
+	$a = array_merge($a, $tmp);
+	// echo implode(',', $a);die;
+	return $v;
+}
+
+function array_cycle_delete(&$a, $curr_pos, $offset) {
+	$c = count($a);
+	// $offset = ($offset < 0) ? ($offset + 1) : $offset;
+	$del_idx = ($curr_pos - 1) + $offset; // Convert position to array idx
+	while ($del_idx > $c || $del_idx < 0) {
+		$del_idx += ($del_idx > $c) ? -$c : $c;
+	}
+	$v = array_delete($a, $del_idx);
+	return [($del_idx + 1), $v];
+}
+
 global $TIMER;
 $TIMER = new show_memory_timing;
 // echo chr(65) . ord('A');
+
+define('TEST_CYCLE_ARRAY_FUNCS', 0);
+
+if (TEST_CYCLE_ARRAY_FUNCS) {
+	$a = [1, 2, 3, 4, 5, 6];
+	debug_msg("Input: " . implode(',', $a));
+
+	$idx = array_cycle_insert($a, 'A', 2, 1);
+	debug_msg(implode(',', $a) . "; Ins val: {$a[$idx]}; Array pos: $idx");
+	list($idx, $v) = array_cycle_delete($a, $idx + 1, -3);
+	debug_msg(implode(',', $a) . "; Del val: $v; Array pos: $idx");
+}
